@@ -1,0 +1,4 @@
+- name: restart warcprox
+  systemd:
+    name: warcprox
+    state: restarted

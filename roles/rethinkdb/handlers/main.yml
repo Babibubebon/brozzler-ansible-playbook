@@ -1,0 +1,4 @@
+- name: restart rethinkdb
+  systemd:
+    name: rethinkdb@brozzler
+    state: restarted

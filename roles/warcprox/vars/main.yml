@@ -1,0 +1,2 @@
+working_dir: /var/lib/warcprox
+warcs_dir: /var/lib/warcprox/warcs

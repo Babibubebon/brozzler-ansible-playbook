@@ -1,0 +1,23 @@
+- name: install python3.4
+  yum:
+    name:
+      - python34
+      - python34-pip
+    state: present
+
+- name: update pip
+  pip:
+    name: pip
+    state: latest
+    executable: pip3.4
+
+- command: id {{user}}
+  register: id_user
+  ignore_errors: true
+  changed_when: false
+
+- name: ensure service user {{user}} exists
+  user: name={{user}} system=yes createhome=no home=/nonexistent
+        shell=/usr/sbin/nologin
+  become: true
+  when: id_user is failed

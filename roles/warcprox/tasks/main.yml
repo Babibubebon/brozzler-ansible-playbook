@@ -1,0 +1,39 @@
+- pip:
+    name:
+      - git+https://github.com/internetarchive/warcprox.git@master#egg=warcprox
+    state: latest
+    executable: pip3.4
+  notify:
+    - restart warcprox
+
+- template:
+    src: warcprox.service.j2
+    dest: /etc/systemd/system/warcprox.service
+  notify:
+    - restart warcprox
+
+- name: create warcs directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+  with_items:
+    - "{{ working_dir }}"
+    - "{{ warcs_dir }}"
+  notify:
+    - restart warcprox
+
+- name: enable and start warcprox service
+  systemd:
+    name: warcprox
+    daemon_reload: yes
+    enabled: yes
+    state: started
+
+- name: open port
+  firewalld:
+    port: "8000/tcp"
+    permanent: yes
+    immediate: yes
+    state: enabled

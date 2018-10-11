@@ -1,0 +1,23 @@
+- name: install rethinkdb
+  hosts: rethinkdb
+  become: yes
+  roles:
+    - rethinkdb
+  tags:
+    - rethinkdb
+
+- name: install warcprox
+  hosts: warcprox
+  become: yes
+  roles:
+    - warcprox
+  tags:
+    - warcprox
+
+- name: install brozzler-dashboard
+  hosts: brozzler-dashboard
+  become: yes
+  roles:
+    - brozzler-dashboard
+  tags:
+    - brozzler-dashboard

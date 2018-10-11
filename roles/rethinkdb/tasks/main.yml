@@ -1,0 +1,63 @@
+- name: get arch
+  shell: uname -m
+  register: arch
+  changed_when: False
+
+- name: install rethinkdb repo
+  get_url:
+    url: http://download.rethinkdb.com/centos/7/{{ arch.stdout }}/rethinkdb.repo -O /etc/yum.repos.d/rethinkdb.repo
+    dest: /etc/yum.repos.d/rethinkdb.repo
+
+- name: install rethinkdb
+  yum:
+    name: rethinkdb
+    state: present
+
+- name: create tmpfiles.d file
+  template:
+    src: rethinkdb.conf
+    dest: /usr/lib/tmpfiles.d/rethinkdb.conf
+
+- name: create systemd service file
+  template:
+    src: rethinkdb@.service
+    dest: /usr/lib/systemd/system/rethinkdb@.service
+
+- name: create systemd service file
+  template:
+    src: brozzler.conf
+    dest: /etc/rethinkdb/instances.d/brozzler.conf
+
+- name: check data directory
+  stat:
+    path: /var/lib/rethinkdb/brozzler
+  register: data_dir
+
+- name: create data directory
+  shell: rethinkdb create -d /var/lib/rethinkdb/brozzler
+  when: not data_dir.stat.exists
+
+- name:
+  file:
+    path: /var/lib/rethinkdb/brozzler
+    state: directory
+    owner: rethinkdb 
+    group: rethinkdb
+    recurse: yes
+
+- name: enable and start rethinkdb service
+  systemd:
+    name: rethinkdb@brozzler
+    daemon_reload: yes
+    enabled: yes
+    state: started
+
+- name: open tcp port
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  with_items:
+    - 8080
+    - 29015

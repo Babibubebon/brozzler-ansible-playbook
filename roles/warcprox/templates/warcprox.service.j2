@@ -1,0 +1,25 @@
+[Unit]
+Description=Warcprox service
+After=network.target
+
+[Service]
+User={{ user }}
+Group={{ user }}
+ExecStart=/usr/bin/warcprox \
+  --address=0.0.0.0 \
+  --port=8000 \
+  --dir={{ warcs_dir }} \
+  --base32 \
+  --gzip \
+  --rollover-idle-time=120 \
+  --rethinkdb-services-url=rethinkdb://{{groups['rethinkdb']|join(',')}}/brozzler/services \
+  --rethinkdb-stats-url=rethinkdb://{{groups['rethinkdb']|join(',')}}/brozzler/stats \
+  --rethinkdb-big-table-url=rethinkdb://{{groups['rethinkdb']|join(',')}}/brozzler/captures
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+KillMode=process
+Restart=on-failure
+WorkingDirectory={{ working_dir }}
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,4 @@
+- name: restart brozzler-dashboard
+  systemd:
+    name: brozzler-dashboard
+    state: restarted

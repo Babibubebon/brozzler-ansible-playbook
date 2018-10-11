@@ -1,0 +1,29 @@
+- pip:
+    name: brozzler[dashboard]
+    state: latest
+    executable: pip3.4
+  notify:
+    - restart brozzler-dashboard
+
+- template:
+    src: brozzler-dashboard.service.j2
+    dest: /etc/systemd/system/brozzler-dashboard.service
+  notify:
+    - restart brozzler-dashboard
+
+- name: enable and start brozzler-dashboard service
+  systemd:
+    name: brozzler-dashboard
+    daemon_reload: yes
+    enabled: yes
+    state: started
+
+- name: ensure brozzler tables
+  shell: "brozzler-ensure-tables --rethinkdb-servers={{groups['rethinkdb'] | join(',')}} --rethinkdb-db=brozzler"
+
+- name: open port
+  firewalld:
+    port: "8881/tcp"
+    permanent: yes
+    immediate: yes
+    state: enabled

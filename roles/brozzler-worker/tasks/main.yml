@@ -63,7 +63,7 @@
     state: enabled
 
 - pip:
-    name: brozzler
+    name: "{{ brozzler_pip_name }}"
     state: latest
     executable: pip3.4
   notify:

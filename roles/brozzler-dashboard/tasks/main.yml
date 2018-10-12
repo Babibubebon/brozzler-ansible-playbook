@@ -1,5 +1,5 @@
 - pip:
-    name: brozzler[dashboard]
+    name: "{{ brozzler_pip_name }}[dashboard]"
     state: latest
     executable: pip3.4
   notify:

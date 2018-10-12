@@ -1,0 +1,17 @@
+- name: restart vncserver
+  systemd:
+    name: vncserver@:1.service
+    daemon_reload: yes
+    state: restarted
+
+- name: restart brozzler-worker
+  systemd:
+    name: brozzler-worker.service
+    daemon_reload: yes
+    state: restarted
+
+- name: restart vnc-websock
+  systemd:
+    name: vnc-websock.service
+    daemon_reload: yes
+    state: restarted

@@ -1,4 +1,5 @@
 - name: restart brozzler-dashboard
   systemd:
     name: brozzler-dashboard
+    daemon_reload: yes
     state: restarted

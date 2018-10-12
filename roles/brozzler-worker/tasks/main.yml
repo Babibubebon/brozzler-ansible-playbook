@@ -1,0 +1,84 @@
+- name: set locale
+  shell: localectl set-locale LANG=ja_JP.utf8
+
+- name: install vnc
+  yum:
+    name:
+      - tigervnc-server
+      - chromium
+      - http://linuxdownload.adobe.com/adobe-release/adobe-release-x86_64-1.0-1.noarch.rpm
+      - flash-plugin
+      - google-noto-cjk-fonts
+    state: present
+    enablerepo: epel
+
+- name: ensure service user {{ worker_user }} exists
+  user:
+    name: "{{ worker_user }}"
+
+- name: set vnc password
+  shell: "echo -n {{ vnc_password }} | vncpasswd -f > /home/{{ worker_user }}/.vnc/passwd"
+  become_user: "{{ worker_user }}"
+
+- name: install systemd vncserver@:1.service
+  template:
+    src: vncserver.service.j2
+    dest: /etc/systemd/system/vncserver@:1.service
+  notify:
+    - restart vncserver
+
+- name: enable and start vncserver service
+  systemd:
+    name: vncserver@:1.service
+    daemon_reload: yes
+    enabled: yes
+    state: started
+
+- pip:
+    name: websockify
+    state: latest
+    executable: pip3.4
+  notify:
+    - restart vnc-websock
+
+- name: install systemd vnc-websock.service
+  template:
+    src: vnc-websock.service
+    dest: /etc/systemd/system/vnc-websock.service
+  notify:
+    - restart vnc-websock
+
+- name: enable and start vnc-websock.service
+  systemd:
+    name: vnc-websock.service
+    daemon_reload: yes
+    enabled: yes
+    state: started
+
+- name: open port for websockify
+  firewalld:
+    port: "8901/tcp"
+    permanent: yes
+    immediate: yes
+    state: enabled
+
+- pip:
+    name: brozzler
+    state: latest
+    executable: pip3.4
+  notify:
+    - restart brozzler-worker
+
+- name: install systemd brozzler-worker.service
+  template:
+    src: brozzler-worker.service.j2
+    dest: /etc/systemd/system/brozzler-worker.service
+  notify:
+    - restart vncserver
+
+- name: enable and start brozzler-worker.service
+  systemd:
+    name: brozzler-worker.service
+    daemon_reload: yes
+    enabled: yes
+    state: started

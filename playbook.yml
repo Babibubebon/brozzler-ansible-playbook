@@ -21,3 +21,11 @@
     - brozzler-dashboard
   tags:
     - brozzler-dashboard
+
+- name: install brozzler-worker
+  hosts: brozzler-worker
+  become: yes
+  roles:
+    - brozzler-worker
+  tags:
+    - brozzler-worker

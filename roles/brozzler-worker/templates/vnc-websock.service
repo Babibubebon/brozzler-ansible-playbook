@@ -1,0 +1,14 @@
+[Unit]
+Description=vnc-websock service
+After=network.target vncserver@:1.service
+
+[Service]
+User={{ worker_user }}
+Group={{ worker_user }}
+ExecStart=/usr/bin/websockify 0.0.0.0:8901 localhost:5901
+ExecStop=/bin/kill -s TERM $MAINPID
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

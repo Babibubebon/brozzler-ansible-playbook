@@ -1,0 +1,19 @@
+[Unit]
+Description=brozzler-worker service
+After=network.target vncserver@:1.service
+
+[Service]
+User={{ worker_user }}
+Group={{ worker_user }}
+Environment="DISPLAY=:1"
+ExecStart=/usr/bin/brozzler-worker \
+  --rethinkdb-servers={{groups['rethinkdb'] | join(',')}} \
+  --max-browsers=4 \
+  --verbose \
+  --warcprox-auto
+ExecStop=/bin/kill -s TERM $MAINPID
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

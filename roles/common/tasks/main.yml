@@ -3,6 +3,7 @@
     name:
       - python34
       - python34-pip
+      - epel-release
     state: present
 
 - name: update pip

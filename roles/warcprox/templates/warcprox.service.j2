@@ -15,7 +15,6 @@ ExecStart=/usr/bin/warcprox \
   --rethinkdb-services-url=rethinkdb://{{groups['rethinkdb']|join(',')}}/brozzler/services \
   --rethinkdb-stats-url=rethinkdb://{{groups['rethinkdb']|join(',')}}/brozzler/stats \
   --rethinkdb-big-table-url=rethinkdb://{{groups['rethinkdb']|join(',')}}/brozzler/captures
-ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
 KillMode=process
 Restart=on-failure

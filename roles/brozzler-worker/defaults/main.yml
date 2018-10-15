@@ -1,2 +1,4 @@
 worker_user: worker
 vnc_password: password
+browser: chromium-browser
+#browser: google-chrome

@@ -1,13 +1,42 @@
 - name: set locale
   shell: localectl set-locale LANG=ja_JP.utf8
 
-- name: install vnc
+- name: install google-chrome reoo
+  template:
+    src: google-chrome.repo
+    dest: /etc/yum.repos.d/
+  when: browser == "google-chrome"
+
+- name: install google-chrome
+  yum:
+    name: google-chrome-stable
+    state: present
+  when: browser == "google-chrome"
+
+- name: install chromium
+  yum:
+    name:
+      - chromium
+      - http://linuxdownload.adobe.com/adobe-release/adobe-release-x86_64-1.0-1.noarch.rpm
+      - flash-player-ppapi
+    enablerepo: epel
+  when: browser == "chromium-browser"
+
+- name: install flash player plugin
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+  with_items:
+    - src: /usr/lib64/flash-plugin/libpepflashplayer.so
+      dest: /usr/lib64/chromium-browser/PepperFlash/libpepflashplayer.so
+    - src: /usr/lib64/flash-plugin/manifest.json
+      dest: /usr/lib64/chromium-browser/PepperFlash/manifest.json
+
+- name: install vncserver
   yum:
     name:
       - tigervnc-server
-      - chromium
-      - http://linuxdownload.adobe.com/adobe-release/adobe-release-x86_64-1.0-1.noarch.rpm
-      - flash-plugin
       - google-noto-cjk-fonts
     state: present
     enablerepo: epel
@@ -62,8 +91,11 @@
     immediate: yes
     state: enabled
 
-- pip:
-    name: "{{ brozzler_pip_name }}"
+- name: install brozzler
+  pip:
+    name:
+      - "{{ brozzler_pip_name }}"
+      - youtube-dl
     state: latest
     executable: pip3.4
   notify:

@@ -22,3 +22,10 @@
         shell=/usr/sbin/nologin
   become: true
   when: id_user is failed
+
+- name: install libselinux-python module
+  yum: name=libselinux-python state=installed
+
+- name: disable selinux
+  selinux: state=disabled
+  register: selinux

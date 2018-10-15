@@ -10,7 +10,8 @@ ExecStart=/usr/bin/brozzler-worker \
   --rethinkdb-servers={{groups['rethinkdb'] | join(',')}} \
   --max-browsers=4 \
   --verbose \
-  --warcprox-auto
+  --warcprox-auto \
+  --chrome-exe={{ browser }}
 ExecStop=/bin/kill -s TERM $MAINPID
 KillMode=process
 Restart=on-failure

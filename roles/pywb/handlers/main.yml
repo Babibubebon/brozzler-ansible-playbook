@@ -1,0 +1,11 @@
+- name: restart uwsgi
+  systemd:
+    name: emperor.uwsgi.service
+    daemon_reload: yes
+    state: restarted
+
+- name: restart nginx
+  systemd:
+    name: nginx.service
+    daemon_reload: yes
+    state: restarted

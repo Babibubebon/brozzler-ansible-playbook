@@ -29,3 +29,11 @@
     - brozzler-worker
   tags:
     - brozzler-worker
+
+- name: install pywb with uwsgi
+  hosts: pywb
+  become: yes
+  roles:
+    - pywb
+  tags:
+    - pywb

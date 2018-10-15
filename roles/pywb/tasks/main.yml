@@ -1,0 +1,85 @@
+- name: install dependancies
+  yum:
+    name: python34-devel
+    state: present
+
+- name: pip install virtualenv
+  pip:
+    name:
+      - virtualenv
+      - uwsgi
+    state: present
+    executable: pip3.4
+
+- name: "mkdir {{ venv_root }}/pywb-ve34"
+  file:
+    path: "{{ venv_root }}/pywb-ve34"
+    state: directory
+    owner: "{{ user }}"
+
+- name: pip install pywb in virtualenv
+  pip:
+    name: "{{ pywb_pip_name }}"
+    state: latest
+    virtualenv: "{{ venv_root }}/pywb-ve34"
+    virtualenv_python: python3.4
+
+- name: install systemd emperor.uwsgi.service
+  template:
+    src: emperor.uwsgi.service.j2
+    dest: /etc/systemd/system/emperor.uwsgi.service
+  notify:
+    - restart uwsgi
+
+- name: mkdir /etc/uwsgi/vassals
+  file:
+    path: /etc/uwsgi/vassals/
+    state: directory
+
+- name: install uwsgi config for pywb
+  template:
+    src: pywb_uwsgi.ini.j2
+    dest: /etc/uwsgi/vassals/pywb_uwsgi.ini
+  notify:
+    - restart uwsgi
+
+- name: "mkdir {{ pywb_root }}"
+  file:
+    path: "{{ pywb_root }}"
+    state: directory
+    owner: "{{ user }}"
+    group: "{{ user }}"
+
+- name: install nginx
+  yum:
+    name:
+      - nginx
+    enablerepo: epel
+
+- name: install nginx config
+  template:
+    src: pywb.conf.j2
+    dest: /etc/nginx/conf.d/pywb.conf
+  notify:
+    - restart nginx
+
+- name: start & enable emperor.uwsgi.service
+  systemd:
+    name: emperor.uwsgi.service
+    daemon_reload: yes
+    enabled: yes
+    state: started
+
+- name: start & enable nginx
+  systemd:
+    name: nginx.service
+    daemon_reload: yes
+    enabled: yes
+    state: started
+
+- name: open port for websockify
+  firewalld:
+    service: http
+    permanent: yes
+    immediate: yes
+    state: enabled

@@ -1,2 +1,3 @@
 user: brozzler
 brozzler_pip_name: brozzler
+venv_root: /opt
